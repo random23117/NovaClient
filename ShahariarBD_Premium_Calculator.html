@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b0d12">
+<title>ShahariarBD • Premium Calculator</title>
+<style>
+:root{--bg:#080a0f;--panel:#11141c;--panel2:#171b25;--key:#202532;--key2:#292f3d;--text:#f8f9ff;--muted:#8d94a6;--accent:#8b6cff;--accent2:#b49cff;--line:#272c38}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{min-height:100vh}
+.app{width:min(100%,560px);margin:auto;padding:12px 13px 28px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:7px 3px 14px}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#8b6cff,#5540a9);display:grid;place-items:center;font-weight:900;box-shadow:0 8px 28px #5d48c933}
+.brand h1{font-size:17px;margin:0}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.icon{width:42px;height:42px;border-radius:14px;background:var(--panel);border:1px solid var(--line);color:white}
+.screen{background:linear-gradient(160deg,#141821,#0e1118);border:1px solid #252a35;border-radius:27px;padding:18px 17px 16px;box-shadow:0 18px 45px #0008;overflow:hidden}
+.mode{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:18px}.mode b{color:#c7bbff}
+.expression{height:28px;text-align:right;color:#7f8799;font-size:17px;overflow:auto;white-space:nowrap}
+.answer{font-size:42px;font-weight:700;text-align:right;letter-spacing:-1.5px;overflow:auto;white-space:nowrap;margin-top:2px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:11px 0}
+button{font:inherit;border:0;color:var(--text);cursor:pointer;transition:.12s transform,.12s filter,.12s background}
+button:active{transform:scale(.94);filter:brightness(1.2)}
+.q{height:40px;border-radius:12px;background:#161a23;border:1px solid var(--line);font-size:11px;color:#c4c9d6}
+.tabs{display:flex;gap:7px;overflow:auto;padding:2px 0 10px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;padding:9px 13px;border-radius:12px;background:var(--panel);color:#9ea5b6;border:1px solid var(--line);font-size:12px}
+.tab.active{background:#251e42;color:#d8ceff;border-color:#5f4aa0}
+.science,.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.key{min-height:54px;border-radius:16px;background:var(--key);font-size:18px;font-weight:550;border:1px solid #2a3040}
+.fn{font-size:13px;background:#171b24;color:#c5cbd8}.operator{background:#302448;color:#d8cbff}.equals{background:linear-gradient(135deg,#8b6cff,#6048b6);box-shadow:0 10px 25px #6d54d344}
+.zero{grid-column:span 2}
+.section{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:19px;padding:13px;display:none}
+.section.show{display:block}.section h2{font-size:14px;margin:0 0 10px}.muted{font-size:11px;color:var(--muted)}
+.field{width:100%;background:#0d1016;border:1px solid var(--line);color:white;border-radius:12px;padding:12px;margin:5px 0;outline:none}
+.action{width:100%;padding:12px;border-radius:12px;background:var(--accent);color:white;font-weight:700;margin-top:5px}
+.history-item{padding:9px 2px;border-bottom:1px solid var(--line);font-size:12px;color:#b7bdc9}
+.footer{text-align:center;color:#5f6572;font-size:10px;margin-top:17px}
+@media(max-width:360px){.answer{font-size:35px}.key{min-height:50px}.app{padding-left:9px;padding-right:9px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="top">
+ <div class="brand"><div class="logo">S</div><div><h1>ShahariarBD Calculator</h1><small>Premium • Scientific • Offline</small></div></div>
+ <button class="icon" onclick="toggleTheme()" aria-label="theme">☼</button>
+</header>
+
+<section class="screen">
+ <div class="mode"><span id="modeText">SCIENTIFIC</span><b id="angle">DEG</b></div>
+ <div class="expression" id="expr">Ready</div>
+ <div class="answer" id="answer">0</div>
+</section>
+
+<div class="quick">
+ <button class="q" onclick="memory('clear')">MC</button><button class="q" onclick="memory('recall')">MR</button>
+ <button class="q" onclick="memory('add')">M+</button><button class="q" onclick="memory('sub')">M−</button>
+</div>
+
+<div class="tabs">
+ <button class="tab active" onclick="tab('calc',this)">Calculator</button>
+ <button class="tab" onclick="tab('converter',this)">Converter</button>
+ <button class="tab" onclick="tab('history',this)">History</button>
+</div>
+
+<div id="calc">
+ <div class="science">
+  <button class="key fn" onclick="fn('sin')">sin</button><button class="key fn" onclick="fn('cos')">cos</button>
+  <button class="key fn" onclick="fn('tan')">tan</button><button class="key fn" onclick="fn('sqrt')">√</button>
+  <button class="key fn" onclick="fn('ln')">ln</button><button class="key fn" onclick="fn('log')">log</button>
+  <button class="key fn" onclick="put('π')">π</button><button class="key fn" onclick="put('e')">e</button>
+  <button class="key fn" onclick="put('^2')">x²</button><button class="key fn" onclick="put('^')">xʸ</button>
+  <button class="key fn" onclick="put('(')">(</button><button class="key fn" onclick="put(')')">)</button>
+ </div>
+ <div style="height:7px"></div>
+ <div class="keypad">
+  <button class="key fn" onclick="clearAll()">AC</button><button class="key fn" onclick="back()">⌫</button>
+  <button class="key fn" onclick="percent()">%</button><button class="key operator" onclick="put('/')">÷</button>
+  <button class="key" onclick="put('7')">7</button><button class="key" onclick="put('8')">8</button><button class="key" onclick="put('9')">9</button><button class="key operator" onclick="put('*')">×</button>
+  <button class="key" onclick="put('4')">4</button><button class="key" onclick="put('5')">5</button><button class="key" onclick="put('6')">6</button><button class="key operator" onclick="put('-')">−</button>
+  <button class="key" onclick="put('1')">1</button><button class="key" onclick="put('2')">2</button><button class="key" onclick="put('3')">3</button><button class="key operator" onclick="put('+')">+</button>
+  <button class="key zero" onclick="put('0')">0</button><button class="key" onclick="put('.')">.</button><button class="key equals" onclick="calculate()">=</button>
+ </div>
+</div>
+
+<section id="converter" class="section">
+ <h2>Unit Converter</h2><div class="muted">Quick everyday conversions</div>
+ <input class="field" id="cv" type="number" placeholder="Enter value">
+ <select class="field" id="cu">
+  <option value="m">Meters → Feet / Kilometers</option><option value="km">Kilometers → Miles / Meters</option>
+  <option value="kg">Kilograms → Pounds</option><option value="c">Celsius → Fahrenheit</option>
+  <option value="l">Liters → US Gallons</option>
+ </select>
+ <button class="action" onclick="convert()">Convert</button><div id="cvout" style="padding-top:10px;font-size:13px"></div>
+</section>
+
+<section id="history" class="section">
+ <h2>Calculation History</h2><div id="hist"></div>
+ <button class="action" onclick="clearHistory()">Clear History</button>
+</section>
+
+<div class="footer">SHAHARIARBD • ADVANCED CALCULATOR • v1.0</div>
+</main>
+
+<script>
+let exp='',mem=0,deg=true,hist=[];
+const $=id=>document.getElementById(id);
+function render(){ $('expr').textContent=exp||'Ready'; $('answer').textContent=exp||'0';}
+function put(x){exp+=x;render()}
+function back(){exp=exp.slice(0,-1);render()}
+function clearAll(){exp='';$('expr').textContent='Ready';$('answer').textContent='0'}
+function fn(x){exp+=x+'(';render()}
+function angleMode(){deg=!deg;$('angle').textContent=deg?'DEG':'RAD'}
+$('angle').onclick=angleMode;
+function norm(s){return s.replace(/π/g,'Math.PI').replace(/\be\b/g,'Math.E').replace(/sin\(/g,'S(').replace(/cos\(/g,'C(').replace(/tan\(/g,'T(').replace(/sqrt\(/g,'Math.sqrt(').replace(/ln\(/g,'Math.log(').replace(/log\(/g,'Math.log10(').replace(/\^/g,'**')}
+function evaluate(s){let n=norm(s),rad=x=>deg?x*Math.PI/180:x,S=x=>Math.sin(rad(x)),C=x=>Math.cos(rad(x)),T=x=>Math.tan(rad(x));return Function('S','C','T','return '+n)(S,C,T)}
+function fmt(x){if(!Number.isFinite(x))throw 0;return Math.abs(x-Math.round(x))<1e-10?String(Math.round(x)):Number(x.toPrecision(12)).toString()}
+function calculate(){try{let v=fmt(evaluate(exp));if(exp)hist.unshift(exp+' = '+v);hist=hist.slice(0,40);$('expr').textContent=exp+' =';$('answer').textContent=v;exp=v;drawHist()}catch{$('answer').textContent='Error'}}
+function percent(){try{exp=fmt(evaluate(exp)/100);render()}catch{}}
+function memory(a){try{if(a==='clear')mem=0;if(a==='recall'){exp+=fmt(mem);render()}if(a==='add')mem+=evaluate(exp);if(a==='sub')mem-=evaluate(exp)}catch{}}
+function tab(which,btn){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$('calc').style.display=which==='calc'?'block':'none';$('converter').classList.toggle('show',which==='converter');$('history').classList.toggle('show',which==='history');if(which==='history')drawHist()}
+function drawHist(){$('hist').innerHTML=hist.length?hist.map(x=>'<div class="history-item">'+x+'</div>').join(''):'<div class="muted">No calculations yet.</div>'}
+function clearHistory(){hist=[];drawHist()}
+function convert(){let v=+$('cv').value,u=$('cu').value,r='';if(!Number.isFinite(v))return;if(u==='m')r=fmt(v*3.280839895)+' ft  •  '+fmt(v/1000)+' km';if(u==='km')r=fmt(v*.621371)+' mi  •  '+fmt(v*1000)+' m';if(u==='kg')r=fmt(v*2.20462262)+' lb';if(u==='c')r=fmt(v*9/5+32)+' °F';if(u==='l')r=fmt(v*.2641720524)+' US gal';$('cvout').textContent=r}
+function toggleTheme(){document.documentElement.style.setProperty('--accent',getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()==='#8b6cff'?'#00a99d':'#8b6cff')}
+document.addEventListener('keydown',e=>{if(/[0-9.+\-*/()]/.test(e.key))put(e.key);else if(e.key==='Enter')calculate();else if(e.key==='Backspace')back();else if(e.key==='Escape')clearAll()});
+render();
+</script>
+</body>
+</html>
